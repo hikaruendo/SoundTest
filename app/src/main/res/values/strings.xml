@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Sounds</string>
+    <string name="bt_play_kpop">k-pop</string>
+    <string name="bt_play_jpop">j-pop</string>
+    <string name="bt_play_rb">rb</string>
+    <string name="bt_play_yogaku">yogaku</string>
+    <string name="bt_play_play">再生</string>
+    <string name="bt_play_pause">一時停止</string>
+    <string name="bt_back">&lt;&lt;</string>
+    <string name="bt_forward">&gt;&gt;</string>
+    <string name="tv_loop">リピート再生</string>
+</resources>
