@@ -47,10 +47,16 @@ public class MainActivity extends AppCompatActivity {
         _btBack.setEnabled(true);
         _btForward.setEnabled(true);
 
+        _player = new MediaPlayer();
+
 
     }
 
     public void kpop(View view) {
+        if (_player != null) {
+            _player.stop();
+            _btPlay.setText(R.string.bt_play_play);
+        }
         _player = new MediaPlayer();
         String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.kpop_man_sample;
 
@@ -77,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void jpop(View view) {
+        if (_player != null) {
+            _player.stop();
+            _btPlay.setText(R.string.bt_play_play);
+        }
         _player = new MediaPlayer();
         String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.poprock_sample_man;
 
@@ -103,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void rb(View view) {
+        if (_player != null) {
+            _player.stop();
+            _btPlay.setText(R.string.bt_play_play);
+        }
         _player = new MediaPlayer();
         String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.rb_sample_man;
 
@@ -129,6 +143,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void yogaku(View view) {
+        if (_player != null) {
+            _player.stop();
+            _btPlay.setText(R.string.bt_play_play);
+        }
         _player = new MediaPlayer();
         String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.yougaku_sample_man;
 
