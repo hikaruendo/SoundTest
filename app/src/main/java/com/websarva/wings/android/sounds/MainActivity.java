@@ -2,12 +2,18 @@ package com.websarva.wings.android.sounds;
 
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
+import android.service.autofill.TextValueSanitizer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import java.io.IOException;
 
@@ -23,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private Button _btPlay;
     private Button _btBack;
     private Button _btForward;
+
+    private int totalTime;
+    private TextView elapsedTimeLabel;
+    private TextView remainingTimeLabel;
+    private SeekBar positionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
         _player = new MediaPlayer();
 
+        elapsedTimeLabel = findViewById(R.id.elapsedTimeLabel);
+        remainingTimeLabel = findViewById(R.id.remainingTimeLabel);
+
 
     }
 
@@ -57,28 +71,73 @@ public class MainActivity extends AppCompatActivity {
             _player.stop();
             _btPlay.setText(R.string.bt_play_play);
         }
-        _player = new MediaPlayer();
-        String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.kpop_man_sample;
+//        _player = new MediaPlayer();
+//        String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.kpop_man_sample;
+//
+//        //音声ファイルのURI文字列を元にURIオブジェクトを生成。
+//        Uri mediaFileUri = Uri.parse(mediaFileUriStr);
+//        try {
+//            //メディアプレーヤーに音声ファイルを指定。
+//            _player.setDataSource(MainActivity.this, mediaFileUri);
+//            //非同期でのメディア再生準備が完了した際のリスナを設定。
+//            //_player.setOnPreparedListener(new PlayerPreparedListener());
+//            //メディア再生が終了した際のリスナを設定。
+//            _player.setOnCompletionListener(new PlayerCompletionListener());
+//            //非同期でメディア再生を準備。
+//            _player.prepareAsync();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
-        //音声ファイルのURI文字列を元にURIオブジェクトを生成。
-        Uri mediaFileUri = Uri.parse(mediaFileUriStr);
-        try {
-            //メディアプレーヤーに音声ファイルを指定。
-            _player.setDataSource(MainActivity.this, mediaFileUri);
-            //非同期でのメディア再生準備が完了した際のリスナを設定。
-            //_player.setOnPreparedListener(new PlayerPreparedListener());
-            //メディア再生が終了した際のリスナを設定。
-            _player.setOnCompletionListener(new PlayerCompletionListener());
-            //非同期でメディア再生を準備。
-            _player.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        _player = MediaPlayer.create(this, R.raw.kpop_man_sample);
 
-        //スイッチを取得。
-        Switch loopSwitch = findViewById(R.id.swLoop);
-        //スイッチにリスナを設定。
-        loopSwitch.setOnCheckedChangeListener(new LoopSwitchChangedListener());
+        _player.setLooping(true);
+        _player.seekTo(0);
+        totalTime = _player.getDuration();
+
+        positionBar = findViewById(R.id.positionBar);
+        positionBar.setMax(totalTime);
+        positionBar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if (fromUser){
+                            _player.seekTo(progress);
+                            positionBar.setProgress(progress);
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                }
+        );
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (_player != null) {
+                    try {
+                        Message msg = new Message();
+                        msg.what =_player.getCurrentPosition();
+                        handler.sendMessage(msg);
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }).start();
+
+//        //スイッチを取得。
+//        Switch loopSwitch = findViewById(R.id.swLoop);
+//        //スイッチにリスナを設定。
+//        loopSwitch.setOnCheckedChangeListener(new LoopSwitchChangedListener());
 
     }
 
@@ -87,28 +146,73 @@ public class MainActivity extends AppCompatActivity {
             _player.stop();
             _btPlay.setText(R.string.bt_play_play);
         }
-        _player = new MediaPlayer();
-        String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.poprock_sample_man;
+//        _player = new MediaPlayer();
+//        String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.poprock_sample_man;
+//
+//        //音声ファイルのURI文字列を元にURIオブジェクトを生成。
+//        Uri mediaFileUri = Uri.parse(mediaFileUriStr);
+//        try {
+//            //メディアプレーヤーに音声ファイルを指定。
+//            _player.setDataSource(MainActivity.this, mediaFileUri);
+//            //非同期でのメディア再生準備が完了した際のリスナを設定。
+//            //_player.setOnPreparedListener(new PlayerPreparedListener());
+//            //メディア再生が終了した際のリスナを設定。
+//            _player.setOnCompletionListener(new PlayerCompletionListener());
+//            //非同期でメディア再生を準備。
+//            _player.prepareAsync();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
-        //音声ファイルのURI文字列を元にURIオブジェクトを生成。
-        Uri mediaFileUri = Uri.parse(mediaFileUriStr);
-        try {
-            //メディアプレーヤーに音声ファイルを指定。
-            _player.setDataSource(MainActivity.this, mediaFileUri);
-            //非同期でのメディア再生準備が完了した際のリスナを設定。
-            //_player.setOnPreparedListener(new PlayerPreparedListener());
-            //メディア再生が終了した際のリスナを設定。
-            _player.setOnCompletionListener(new PlayerCompletionListener());
-            //非同期でメディア再生を準備。
-            _player.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        _player = MediaPlayer.create(this, R.raw.poprock_sample_man);
 
-        //スイッチを取得。
-        Switch loopSwitch = findViewById(R.id.swLoop);
-        //スイッチにリスナを設定。
-        loopSwitch.setOnCheckedChangeListener(new LoopSwitchChangedListener());
+        _player.setLooping(true);
+        _player.seekTo(0);
+        totalTime = _player.getDuration();
+
+        positionBar = findViewById(R.id.positionBar);
+        positionBar.setMax(totalTime);
+        positionBar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if (fromUser){
+                            _player.seekTo(progress);
+                            positionBar.setProgress(progress);
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                }
+        );
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (_player != null) {
+                    try {
+                        Message msg = new Message();
+                        msg.what =_player.getCurrentPosition();
+                        handler.sendMessage(msg);
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }).start();
+
+//        //スイッチを取得。
+//        Switch loopSwitch = findViewById(R.id.swLoop);
+//        //スイッチにリスナを設定。
+//        loopSwitch.setOnCheckedChangeListener(new LoopSwitchChangedListener());
 
     }
 
@@ -117,28 +221,73 @@ public class MainActivity extends AppCompatActivity {
             _player.stop();
             _btPlay.setText(R.string.bt_play_play);
         }
-        _player = new MediaPlayer();
-        String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.rb_sample_man;
+//        _player = new MediaPlayer();
+//        String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.rb_sample_man;
+//
+//        //音声ファイルのURI文字列を元にURIオブジェクトを生成。
+//        Uri mediaFileUri = Uri.parse(mediaFileUriStr);
+//        try {
+//            //メディアプレーヤーに音声ファイルを指定。
+//            _player.setDataSource(MainActivity.this, mediaFileUri);
+//            //非同期でのメディア再生準備が完了した際のリスナを設定。
+//            //_player.setOnPreparedListener(new PlayerPreparedListener());
+//            //メディア再生が終了した際のリスナを設定。
+//            _player.setOnCompletionListener(new PlayerCompletionListener());
+//            //非同期でメディア再生を準備。
+//            _player.prepareAsync();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        //スイッチを取得。
+//        Switch loopSwitch = findViewById(R.id.swLoop);
+//        //スイッチにリスナを設定。
+//        loopSwitch.setOnCheckedChangeListener(new LoopSwitchChangedListener());
 
-        //音声ファイルのURI文字列を元にURIオブジェクトを生成。
-        Uri mediaFileUri = Uri.parse(mediaFileUriStr);
-        try {
-            //メディアプレーヤーに音声ファイルを指定。
-            _player.setDataSource(MainActivity.this, mediaFileUri);
-            //非同期でのメディア再生準備が完了した際のリスナを設定。
-            //_player.setOnPreparedListener(new PlayerPreparedListener());
-            //メディア再生が終了した際のリスナを設定。
-            _player.setOnCompletionListener(new PlayerCompletionListener());
-            //非同期でメディア再生を準備。
-            _player.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        _player = MediaPlayer.create(this, R.raw.rb_sample_man);
 
-        //スイッチを取得。
-        Switch loopSwitch = findViewById(R.id.swLoop);
-        //スイッチにリスナを設定。
-        loopSwitch.setOnCheckedChangeListener(new LoopSwitchChangedListener());
+        _player.setLooping(true);
+        _player.seekTo(0);
+        totalTime = _player.getDuration();
+
+        positionBar = findViewById(R.id.positionBar);
+        positionBar.setMax(totalTime);
+        positionBar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if (fromUser){
+                            _player.seekTo(progress);
+                            positionBar.setProgress(progress);
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                }
+        );
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (_player != null) {
+                    try {
+                        Message msg = new Message();
+                        msg.what =_player.getCurrentPosition();
+                        handler.sendMessage(msg);
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }).start();
 
     }
 
@@ -146,29 +295,77 @@ public class MainActivity extends AppCompatActivity {
         if (_player != null) {
             _player.stop();
             _btPlay.setText(R.string.bt_play_play);
+            if(_player.isLooping()) {
+                _player.setLooping(false);
+            }
         }
-        _player = new MediaPlayer();
-        String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.yougaku_sample_man;
+//        _player = new MediaPlayer();
+//        String mediaFileUriStr = "android.resource://" + getPackageName() + "/" + R.raw.yougaku_sample_man;
+//
+//        //音声ファイルのURI文字列を元にURIオブジェクトを生成。
+//        Uri mediaFileUri = Uri.parse(mediaFileUriStr);
+//        try {
+//            //メディアプレーヤーに音声ファイルを指定。
+//            _player.setDataSource(MainActivity.this, mediaFileUri);
+//            //非同期でのメディア再生準備が完了した際のリスナを設定。
+//            //_player.setOnPreparedListener(new PlayerPreparedListener());
+//            //メディア再生が終了した際のリスナを設定。
+//            _player.setOnCompletionListener(new PlayerCompletionListener());
+//            //非同期でメディア再生を準備。
+//            _player.prepareAsync();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        //スイッチを取得。
+//        Switch loopSwitch = findViewById(R.id.swLoop);
+//        //スイッチにリスナを設定。
+//        loopSwitch.setOnCheckedChangeListener(new LoopSwitchChangedListener());
 
-        //音声ファイルのURI文字列を元にURIオブジェクトを生成。
-        Uri mediaFileUri = Uri.parse(mediaFileUriStr);
-        try {
-            //メディアプレーヤーに音声ファイルを指定。
-            _player.setDataSource(MainActivity.this, mediaFileUri);
-            //非同期でのメディア再生準備が完了した際のリスナを設定。
-            //_player.setOnPreparedListener(new PlayerPreparedListener());
-            //メディア再生が終了した際のリスナを設定。
-            _player.setOnCompletionListener(new PlayerCompletionListener());
-            //非同期でメディア再生を準備。
-            _player.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        _player = MediaPlayer.create(this, R.raw.yougaku_sample_man);
 
-        //スイッチを取得。
-        Switch loopSwitch = findViewById(R.id.swLoop);
-        //スイッチにリスナを設定。
-        loopSwitch.setOnCheckedChangeListener(new LoopSwitchChangedListener());
+        _player.setLooping(true);
+        _player.seekTo(0);
+        totalTime = _player.getDuration();
+
+        positionBar = findViewById(R.id.positionBar);
+        positionBar.setMax(totalTime);
+        positionBar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if (fromUser){
+                            _player.seekTo(progress);
+                            positionBar.setProgress(progress);
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                }
+        );
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (_player != null) {
+                    try {
+                        Message msg = new Message();
+                        msg.what =_player.getCurrentPosition();
+                        handler.sendMessage(msg);
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }).start();
 
     }
 
@@ -237,24 +434,54 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    }
 
-    private class PlayerCompletionListener implements MediaPlayer.OnCompletionListener {
+//    private class PlayerCompletionListener implements MediaPlayer.OnCompletionListener {
+//
+//        @Override
+//        public void onCompletion(MediaPlayer mp) {
+//            //ループ設定がされていないならば…
+//            if(!_player.isLooping()) {
+//                //再生ボタンのラベルを「再生」に設定。
+//                _btPlay.setText(R.string.bt_play_play);
+//            }
+//        }
+//    }
 
+//    private class LoopSwitchChangedListener implements CompoundButton.OnCheckedChangeListener {
+//
+//        @Override
+//        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//            //ループするかどうかを設定。
+//            _player.setLooping(isChecked);
+//        }
+//    }
+
+    private Handler handler = new Handler(new Handler.Callback() {
         @Override
-        public void onCompletion(MediaPlayer mp) {
-            //ループ設定がされていないならば…
-            if(!_player.isLooping()) {
-                //再生ボタンのラベルを「再生」に設定。
-                _btPlay.setText(R.string.bt_play_play);
-            }
-        }
-    }
+        public boolean handleMessage(Message msg) {
 
-    private class LoopSwitchChangedListener implements CompoundButton.OnCheckedChangeListener {
+            int currentPosition = msg.what;
 
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            //ループするかどうかを設定。
-            _player.setLooping(isChecked);
+            positionBar.setProgress(currentPosition);
+
+            String elapsedTime = createTimeLabel(currentPosition);
+            elapsedTimeLabel.setText(elapsedTime);
+
+            String remainingTime =  "- " + createTimeLabel(totalTime-currentPosition);
+            remainingTimeLabel.setText(remainingTime);
+
+            return true;
         }
+    });
+
+    public String createTimeLabel(int time){
+        String timeLabel = "";
+        int min = time / 1000 / 60;
+        int sec = time / 1000 % 60;
+
+        timeLabel = min + ":";
+        if (sec < 10) timeLabel += "0";
+        timeLabel += sec;
+
+        return timeLabel;
     }
 }
